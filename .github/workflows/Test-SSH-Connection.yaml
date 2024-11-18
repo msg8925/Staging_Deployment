@@ -22,5 +22,9 @@ jobs:
         env:
           HOSTINGER_SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
 
+      - name: Test SSH Connection
+              run: |
+                ssh -o StrictHostKeyChecking=no ssh -p 65002 u605848448@217.21.77.232 "echo 'SSH connection successful!'"
+
 
       
