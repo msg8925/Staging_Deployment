@@ -1,0 +1,41 @@
+# Blue-Green Deployment Workflow
+
+on:
+  workflow_dispatch: # Allows manual triggering of the workflow
+
+jobs:
+  # Check which environment is currently active
+  get-active-environment:
+    runs-on: ubuntu-latest
+    outputs:
+      env: ${{ steps.set-env-output.outputs.env }}  # Ensure this is correctly passed as output
+    steps:
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.HOSTINGER_SSH_KEY }}
+
+      - name: Determine current environment
+        id: get-active
+        run: |
+          ssh -p 65002 -o StrictHostKeyChecking=no u605848448@217.21.77.232 'readlink /home/u605848448/domains/michael-gibbs-testing.site/public_html/current || echo "ERROR"' > current_env.txt
+          if [ ! -s current_env.txt ]; then
+            echo "ERROR: No environment file found or permission denied" > current_env.txt
+          fi
+
+      - name: Set environment based on active
+        id: set-env-output  # This ID is needed for the outputs to be accessible
+        run: |
+
+          env_value=$(cat current_env.txt | tr -d '\n' | tr -d '\r')  # Removes any newlines or carriage returns
+          echo "::set-output name=env::$env_value"  # Set 'env' output for next jobs
+
+          # Set project directory based on environment
+          if [[ "$env_value" == '/home/u605848448/domains/michael-gibbs-testing.site/blue/public/' ]]; then
+            echo "/home/u605848448/domains/michael-gibbs-testing.site/blue/" > project_dir.txt
+          else
+            echo "/home/u605848448/domains/michael-gibbs-testing.site/green/" > project_dir.txt
+          fi
+                      
+      - name: Output environment value
+        run: echo ${{ steps.set-env-output.outputs.env }}   # Debugging step
