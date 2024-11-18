@@ -11,15 +11,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "$HOSTINGER_SSH_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H 217.21.77.232 >> ~/.ssh/known_hosts
+      - name: Debug SSH Key
+        run: echo "$HOSTINGER_SSH_KEY" | head -n 5
         env:
           HOSTINGER_SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
 
-      - name: Test SSH Connection
-        run: |
-          ssh -o StrictHostKeyChecking=no ssh -p 65002 u605848448@217.21.77.232 "echo 'SSH connection successful!'"
+      
