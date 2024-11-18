@@ -31,7 +31,6 @@ jobs:
         run: |
           env_value=$(cat current_env.txt | tr -d '\n' | tr -d '\r')  # Remove newlines or carriage returns
           echo "Environment value: $env_value"  # Debugging
-          echo "env=$env_value" >> $GITHUB_ENV
 
           # Set project directory based on environment
           if [[ "$env_value" == "/home/u605848448/domains/michael-gibbs-testing.site/blue/public/" ]]; then
@@ -39,9 +38,10 @@ jobs:
           else
             project_dir="/home/u605848448/domains/michael-gibbs-testing.site/green/"
           fi
+
+          # Set environment values so that they can be passed to next stage
+          echo "env=$env_value" >> $GITHUB_ENV
           echo "project_dir=$project_dir" >> $GITHUB_ENV
-          echo "::set-output name=env::$env_value"
-          echo "::set-output name=project_dir::$project_dir"
 
       - name: Output environment value
         run: |
