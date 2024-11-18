@@ -47,3 +47,12 @@ jobs:
         run: |
           echo "Environment: ${{ steps.set-env-output.outputs.env }}"
           echo "Project Directory: ${{ steps.set-env-output.outputs.project_dir }}"
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: get-active-environment
+    steps:
+      - name: Output environment values
+        run: |
+          echo "Environment: ${{ needs.get-active-environment.outputs.env }}"  # Access output from previous job
+          echo "Project Directory: ${{ needs.get-active-environment.outputs.project_dir }}"
