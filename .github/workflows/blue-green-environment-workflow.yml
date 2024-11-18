@@ -30,7 +30,6 @@ jobs:
         id: set-env-output
         run: |
           env_value=$(cat current_env.txt | tr -d '\n' | tr -d '\r')  # Remove newlines or carriage returns
-          echo "Environment value: $env_value"  # Debugging
 
           # Set project directory based on environment
           if [[ "$env_value" == "/home/u605848448/domains/michael-gibbs-testing.site/blue/public/" ]]; then
@@ -39,14 +38,18 @@ jobs:
             project_dir="/home/u605848448/domains/michael-gibbs-testing.site/green/"
           fi
 
-          # Set environment values so that they can be passed to next stage
+          # Persist to GITHUB_ENV
           echo "env=$env_value" >> $GITHUB_ENV
           echo "project_dir=$project_dir" >> $GITHUB_ENV
 
+          # Set outputs for the deploy job
+          echo "::set-output name=env::$env_value"
+          echo "::set-output name=project_dir::$project_dir"
+
       - name: Output environment value
         run: |
-          echo "Environment: ${{ steps.set-env-output.outputs.env }}"
-          echo "Project Directory: ${{ steps.set-env-output.outputs.project_dir }}"
+          echo "Environment: $env_value"        # Using local variable
+          echo "Project Directory: $project_dir" # Using local variable
 
   deploy:
     runs-on: ubuntu-latest
@@ -54,7 +57,7 @@ jobs:
     steps:
       - name: Output environment values
         run: |
-          echo "Environment: ${{ needs.get-active-environment.outputs.env }}"  # Access output from previous job
+          echo "Environment: ${{ needs.get-active-environment.outputs.env }}"
           echo "Project Directory: ${{ needs.get-active-environment.outputs.project_dir }}"
 
       - name: Check out code
