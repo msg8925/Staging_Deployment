@@ -75,6 +75,41 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-dev --optimize-autoloader
 
+      - name: Deploy to Standby Environment
+        if: ${{ env.env == '/home/u605848448/domains/michael-gibbs-testing.site/blue/public/' }}
+        uses: SamKirkland/FTP-Deploy-Action@4.1.0
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          protocol: ftp
+          local-dir: "./"
+          server-dir: ${{ secrets.GREEN_DEPLOY_PATH }}
+          exclude: |
+            .git*
+            node_modules/*
+            tests/*
+            .env
+            .github/*
+
+      - name: Deploy to Blue Environment
+        if: ${{ env.env == '/home/u605848448/domains/michael-gibbs-testing.site/green/public/' }}
+        uses: SamKirkland/FTP-Deploy-Action@4.1.0
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          protocol: ftp
+          local-dir: "./"
+          server-dir: ${{ secrets.BLUE_DEPLOY_PATH }}
+          exclude: |
+            .git*
+            node_modules/*
+            tests/*
+            .env
+            .github/*
 
   swap:
       runs-on: ubuntu-latest
