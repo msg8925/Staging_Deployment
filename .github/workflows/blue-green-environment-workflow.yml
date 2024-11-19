@@ -43,8 +43,8 @@ jobs:
           echo "project_dir=$project_dir" >> $GITHUB_ENV
 
           # Set outputs for the deploy job
-          # echo "::set-output name=env::$env_value"
-          # echo "::set-output name=project_dir::$project_dir"
+          echo "::set-output name=env::$env_value"
+          echo "::set-output name=project_dir::$project_dir"
 
       - name: Output environment value
         run: |
