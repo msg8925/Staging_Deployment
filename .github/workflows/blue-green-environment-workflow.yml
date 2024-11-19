@@ -33,7 +33,7 @@ jobs:
       - name: Set environment based on active
         id: set-env-output
         run: |
-          echo "env_value=$(cat current_env.txt | tr -d '\n' | tr -d '\r')" >> $GITHUB_ENV  # Remove newlines or carriage returns
+          env_value=$(cat current_env.txt | tr -d '\n' | tr -d '\r')  # Remove newlines or carriage returns
 
           # Set project directory based on environment
           if [[ ${{ env_value == "/home/u605848448/domains/michael-gibbs-testing.site/blue/public/" }} ]]; then
