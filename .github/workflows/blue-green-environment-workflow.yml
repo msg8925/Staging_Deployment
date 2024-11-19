@@ -48,8 +48,10 @@ jobs:
 
       - name: Output environment value
         run: |
-          echo "Environment: $env_value"        # Using local variable
-          echo "Project Directory: $project_dir" # Using local variable
+          echo "Environment: ${{ env.env }}"
+          echo "Project Directory: ${{ env.project_dir }}"
+          # echo "Environment: $env_value"        # Using local variable
+          # echo "Project Directory: $project_dir" # Using local variable
 
   deploy:
     runs-on: ubuntu-latest
