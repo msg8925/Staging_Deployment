@@ -33,13 +33,13 @@ jobs:
       - name: Set environment based on active
         id: set-env-output
         run: |
-          env_value=$(cat current_env.txt | tr -d '\n' | tr -d '\r')  # Remove newlines or carriage returns
+          echo "env_value=$(cat current_env.txt | tr -d '\n' | tr -d '\r')" >> $GITHUB_ENV  # Remove newlines or carriage returns
 
           # Set project directory based on environment
-          if [[ "$env_value" == "/home/u605848448/domains/michael-gibbs-testing.site/blue/public/" ]]; then
-            project_dir="/home/u605848448/domains/michael-gibbs-testing.site/blue/"
+          if [[ ${{ env_value == "/home/u605848448/domains/michael-gibbs-testing.site/blue/public/" }} ]]; then
+            echo "project_dir='/home/u605848448/domains/michael-gibbs-testing.site/blue/'" >> $GITHUB_ENV
           else
-            project_dir="/home/u605848448/domains/michael-gibbs-testing.site/green/"
+            echo "project_dir='/home/u605848448/domains/michael-gibbs-testing.site/green/'" >> $GITHUB_ENV
           fi
 
           # Persist to GITHUB_ENV
@@ -52,7 +52,7 @@ jobs:
 
       - name: Output environment value
         run: |
-          echo "Environment: ${{ env.env }}"
+          echo "Environment: ${{ env.env_value }}"
           echo "Project Directory: ${{ env.project_dir }}"
           # echo "Environment: $env_value"        # Using local variable
           # echo "Project Directory: $project_dir" # Using local variable
