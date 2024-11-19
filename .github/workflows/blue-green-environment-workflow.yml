@@ -41,6 +41,8 @@ jobs:
           # Persist to GITHUB_ENV
           echo "::set-output name=env_value::$env_value"
           echo "::set-output name=project_dir::$project_dir"
+          echo "env_value=$env_value" >> $GITHUB_ENV
+          echo "project_dir=$project_dir" >> $GITHUB_ENV
 
       - name: Output environment value
         run: |
