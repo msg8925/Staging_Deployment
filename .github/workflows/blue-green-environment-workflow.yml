@@ -55,6 +55,8 @@ jobs:
     steps:
       - name: Output environment values
         run: |
+          echo "Environment from output: ${{ needs.get-active-environment.outputs.env_value }}"
+          echo "Project Directory from output: ${{ needs.get-active-environment.outputs.project_dir }}"
           echo "Environment: ${{ env.env_value }}"
           echo "Project Directory: ${{ env.project_dir }}"
 
