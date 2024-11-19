@@ -39,7 +39,7 @@ jobs:
           fi
 
           # Persist to GITHUB_ENV
-          echo "env=$env_value" >> $GITHUB_ENV
+          echo "env_value=$env_value" >> $GITHUB_ENV
           echo "project_dir=$project_dir" >> $GITHUB_ENV
 
       - name: Output environment value
