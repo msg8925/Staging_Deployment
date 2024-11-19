@@ -73,7 +73,7 @@ jobs:
         run: composer install --no-dev --optimize-autoloader
 
       - name: Deploy to Standby Environment
-        if: ${{ env.env == '/home/u605848448/domains/michael-gibbs-testing.site/blue/public/' }}
+        if: ${{ needs.get-active-environment.outputs.env_value == '/home/u605848448/domains/michael-gibbs-testing.site/blue/public/' }}
         uses: SamKirkland/FTP-Deploy-Action@4.1.0
         with:
           server: ${{ secrets.FTP_HOST }}
@@ -91,7 +91,7 @@ jobs:
             .github/*
 
       - name: Deploy to Blue Environment
-        if: ${{ env.env == '/home/u605848448/domains/michael-gibbs-testing.site/green/public/' }}
+        if: ${{ needs.get-active-environment.outputs.env_value == '/home/u605848448/domains/michael-gibbs-testing.site/green/public/' }}
         uses: SamKirkland/FTP-Deploy-Action@4.1.0
         with:
           server: ${{ secrets.FTP_HOST }}
