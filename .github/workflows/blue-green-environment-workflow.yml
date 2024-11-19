@@ -7,9 +7,9 @@ jobs:
   # Check which environment is currently active
   get-active-environment:
     runs-on: ubuntu-latest
-    env:
-      env_value: not_set
-      project_dir: not_set
+    outputs:
+      env_value: ${{ steps.set-env-output.outputs.env_value }}
+      project_dir: ${{ steps.set-env-output.outputs.project_dir }}
 
     steps:
       - name: Set up SSH
