@@ -7,9 +7,13 @@ jobs:
   # Check which environment is currently active
   get-active-environment:
     runs-on: ubuntu-latest
-    outputs:
-      env: ${{ steps.set-env-output.outputs.env }}
-      project_dir: ${{ steps.set-env-output.outputs.project_dir }}
+    # outputs:
+    #  env: ${{ steps.set-env-output.outputs.env }}
+    #  project_dir: ${{ steps.set-env-output.outputs.project_dir }}
+
+    env:
+      env_value: not_set
+      project_dir: not_set
 
     steps:
       - name: Set up SSH
@@ -39,12 +43,12 @@ jobs:
           fi
 
           # Persist to GITHUB_ENV
-          echo "env=$env_value" >> $GITHUB_ENV
-          echo "project_dir=$project_dir" >> $GITHUB_ENV
+          # echo "env=$env_value" >> $GITHUB_ENV
+          # echo "project_dir=$project_dir" >> $GITHUB_ENV
 
           # Set outputs for the deploy job
-          echo "::set-output name=env::$env_value"
-          echo "::set-output name=project_dir::$project_dir"
+          # echo "::set-output name=env::$env_value"
+          # echo "::set-output name=project_dir::$project_dir"
 
       - name: Output environment value
         run: |
