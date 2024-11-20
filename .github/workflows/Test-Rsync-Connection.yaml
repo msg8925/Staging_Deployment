@@ -1,0 +1,38 @@
+name: Deploy with Rsync
+
+on:
+  push:
+    branches:
+      - main  # Adjust to your deployment branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up SSH
+      - name: Set up SSH Agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.HOSTINGER_SSH_KEY }}
+
+      # Step 3: Deploy with rsync
+      - name: Deploy Files to Hostinger Server
+        run: |
+          # Define variables
+          REMOTE_USER="u605848448"    # Replace with your Hostinger username
+          REMOTE_HOST="217.21.77.232" # Replace with your Hostinger server IP or hostname
+          REMOTE_PORT="65002"         # Replace with your SSH port
+          REMOTE_DIR="/home/u605848448/domains/your-domain.com/public_html" # Replace with your destination directory
+
+          # Run rsync
+          rsync -avz -e "ssh -p $REMOTE_PORT" ./ $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR \
+            --exclude='.git' \
+            --exclude='node_modules/' \
+            --exclude='.env' \
+            --exclude='tests/' \
+            --delete
