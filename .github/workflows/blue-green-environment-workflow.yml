@@ -89,6 +89,7 @@ jobs:
             tests/*
             .env
             .github/*
+          args: --delete-excluded
 
       - name: Deploy to Blue Environment
         if: ${{ needs.get-active-environment.outputs.env_value == '/home/u605848448/domains/michael-gibbs-testing.site/green/public/' }}
@@ -107,6 +108,7 @@ jobs:
             tests/*
             .env
             .github/*
+          args: --delete-excluded
 
   swap:
       runs-on: ubuntu-latest
