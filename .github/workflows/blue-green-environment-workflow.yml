@@ -72,30 +72,30 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-dev --optimize-autoloader
 
-      - name: Set up SSH key
-        run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          echo "$HOSTINGER_SSH_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H 217.21.77.232 >> ~/.ssh/known_hosts || true
+      # - name: Set up SSH key
+      #   run: |
+      #     mkdir -p ~/.ssh
+      #     chmod 700 ~/.ssh
+      #     echo "$HOSTINGER_SSH_KEY" > ~/.ssh/id_rsa
+      #     chmod 600 ~/.ssh/id_rsa
+      #     ssh-keyscan -H 217.21.77.232 >> ~/.ssh/known_hosts || true
 
-        env:
-          HOSTINGER_SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
+      #   env:
+      #     HOSTINGER_SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
 
-      - name: Clean up Standby Environment
-        if: ${{ needs.get-active-environment.outputs.env_value == '/home/u605848448/domains/michael-gibbs-testing.site/blue/public/' }}
-        run: |
-          ssh -p 65002 -o StrictHostKeyChecking=no u605848448@217.21.77.232 << 'EOF'
-          rm -rf /home/u605848448/domains/michael-gibbs-testing.site/green/.git
-          EOF
+      # - name: Clean up Standby Environment
+      #   if: ${{ needs.get-active-environment.outputs.env_value == '/home/u605848448/domains/michael-gibbs-testing.site/blue/public/' }}
+      #   run: |
+      #     ssh -p 65002 -o StrictHostKeyChecking=no u605848448@217.21.77.232 << 'EOF'
+      #     rm -rf /home/u605848448/domains/michael-gibbs-testing.site/green/.git
+      #     EOF
 
-      - name: Clean up Blue Environment
-        if: ${{ needs.get-active-environment.outputs.env_value == '/home/u605848448/domains/michael-gibbs-testing.site/green/public/' }}
-        run: |
-          ssh -p 65002 -o StrictHostKeyChecking=no u605848448@217.21.77.232 << 'EOF'
-          rm -rf /home/u605848448/domains/michael-gibbs-testing.site/blue/.git
-          EOF
+      # - name: Clean up Blue Environment
+      #   if: ${{ needs.get-active-environment.outputs.env_value == '/home/u605848448/domains/michael-gibbs-testing.site/green/public/' }}
+      #   run: |
+      #     ssh -p 65002 -o StrictHostKeyChecking=no u605848448@217.21.77.232 << 'EOF'
+      #     rm -rf /home/u605848448/domains/michael-gibbs-testing.site/blue/.git
+      #     EOF
 
       - name: Deploy to Standby Environment
         if: ${{ needs.get-active-environment.outputs.env_value == '/home/u605848448/domains/michael-gibbs-testing.site/blue/public/' }}
