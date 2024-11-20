@@ -83,6 +83,10 @@ jobs:
         env:
           HOSTINGER_SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
 
+      - name: Test SSH Connection
+        run: |
+          ssh -o StrictHostKeyChecking=no -p 65002 u605848448@217.21.77.232 "echo 'SSH connection successful!'"
+
       - name: Deploy to Standby Environment
         if: ${{ needs.get-active-environment.outputs.env_value == '/home/u605848448/domains/michael-gibbs-testing.site/blue/public/' }}
         run: |
