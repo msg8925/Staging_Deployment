@@ -1,0 +1,59 @@
+name: Deploy to Staging
+
+on:
+  workflow_dispatch: # Allows manual triggering of the workflow
+# on:
+#   push:
+#     branches:
+#       - staging  # Deploy when pushing to the 'staging' branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # Install dependencies for Laravel app
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2' # or your specific version
+
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "$HOSTINGER_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 217.21.77.232 >> ~/.ssh/known_hosts || true
+
+        env:
+          HOSTINGER_SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
+
+      - name: Test SSH Connection
+        run: |
+          ssh -o StrictHostKeyChecking=no -p 65002 u605848448@217.21.77.232 "echo 'SSH connection successful!'"
+
+      - name: Deploy to Standby Environment
+        run: |
+          # Define variables
+          REMOTE_USER="u605848448"    # Replace with your Hostinger username
+          REMOTE_HOST="217.21.77.232" # Replace with your Hostinger server IP or hostname
+          REMOTE_PORT="65002"         # Replace with your SSH port
+          REMOTE_DIR="domains/michael-gibbs-testing.site/public_html/staging/releases/release-$(date +'%Y-%m-%d-%H%M%S')"
+
+          # Create new directory for release
+          ssh $REMOTE_USER@$REMOTE_HOST "mkdir -p ${REMOTE_DIR}"
+
+          # Run rsync
+          rsync -avz -e "ssh -p $REMOTE_PORT" ./ $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR \
+            --exclude='.git' \
+            --exclude='node_modules/' \
+            --exclude='.env' \
+            --exclude='tests/' \
+            --delete
