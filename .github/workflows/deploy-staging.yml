@@ -57,3 +57,6 @@ jobs:
             --exclude='.env' \
             --exclude='tests/' \
             --delete
+
+          # Create new symlink to point at new release
+          ssh -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "ln -nfs ${REMOTE_DIR} domains/michael-gibbs-testing.site/public_html/staging/testing"
