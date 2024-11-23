@@ -61,4 +61,4 @@ jobs:
             --delete
 
           # Create new symlink to point at new release
-          ssh -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "ln -nfs ${REMOTE_DIR_FULL_PATH} /home/u605848448/domains/michael-gibbs-testing.site/public_html/staging/symTest"
+          ssh -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "ln -nfs ${REMOTE_DIR_FULL_PATH} /home/u605848448/domains/michael-gibbs-testing.site/public_html/staging/current"
