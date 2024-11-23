@@ -47,7 +47,7 @@ jobs:
           REMOTE_PORT="65002"         # Replace with your SSH port
           RELEASE_DIR_NAME="release-$(date +'%Y-%m-%d-%H%M%S')"
           REMOTE_DIR="domains/michael-gibbs-testing.site/public_html/staging/releases/${RELEASE_DIR_NAME}"
-          REMOTE_DIR_FULL_PATH="/home/u605848448/domains/michael-gibbs-testing.site/public_html/staging/releases/${RELEASE_DIR_NAME}"
+          REMOTE_DIR_FULL_PATH="/home/u605848448/domains/michael-gibbs-testing.site/public_html/staging/releases/${RELEASE_DIR_NAME}/"
 
           # Create new directory for release
           ssh -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "mkdir -p ${REMOTE_DIR}"
