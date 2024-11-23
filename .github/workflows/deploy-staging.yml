@@ -62,3 +62,6 @@ jobs:
 
           # Create new symlink to point at new release
           ssh -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "ln -nfs ${REMOTE_DIR_FULL_PATH} /home/u605848448/domains/michael-gibbs-testing.site/public_html/staging/current"
+
+          # Copy .env into the newly deployed directory
+          cp /home/u605848448/domains/michael-gibbs-testing.site/public_html/staging/releases/.env /home/u605848448/domains/michael-gibbs-testing.site/public_html/staging/releases/${RELEASE_DIR_NAME}/
