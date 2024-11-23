@@ -6,5 +6,5 @@ use Illuminate\Support\Facades\Route;
 use function Pest\Laravel\json;
 
 Route::get('/user', function (Request $request) {
-    return response()->json(["Name" => "Victoria", "Age" => "99"]);
+    return response()->json(["Name" => "George", "Age" => "35"]);
 });
