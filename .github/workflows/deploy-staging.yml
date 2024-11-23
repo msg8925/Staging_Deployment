@@ -45,7 +45,9 @@ jobs:
           REMOTE_USER="u605848448"    # Replace with your Hostinger username
           REMOTE_HOST="217.21.77.232" # Replace with your Hostinger server IP or hostname
           REMOTE_PORT="65002"         # Replace with your SSH port
-          REMOTE_DIR="domains/michael-gibbs-testing.site/public_html/staging/releases/release-$(date +'%Y-%m-%d-%H%M%S')"
+          RELEASE_DIR_NAME="release-$(date +'%Y-%m-%d-%H%M%S')"
+          REMOTE_DIR="domains/michael-gibbs-testing.site/public_html/staging/releases/${RELEASE_DIR_NAME}"
+          REMOTE_DIR_FULL_PATH="/home/u605848448/domains/michael-gibbs-testing.site/public_html/staging/releases/${RELEASE_DIR_NAME}"
 
           # Create new directory for release
           ssh -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "mkdir -p ${REMOTE_DIR}"
@@ -59,4 +61,4 @@ jobs:
             --delete
 
           # Create new symlink to point at new release
-          ssh -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "ln -nfs ${REMOTE_DIR} domains/michael-gibbs-testing.site/public_html/staging/testing"
+          ssh -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "ln -nfs ${REMOTE_DIR} ${REMOTE_DIR_FULL_PATH}"
