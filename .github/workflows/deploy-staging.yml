@@ -48,7 +48,7 @@ jobs:
           REMOTE_DIR="domains/michael-gibbs-testing.site/public_html/staging/releases/release-$(date +'%Y-%m-%d-%H%M%S')"
 
           # Create new directory for release
-          ssh $REMOTE_USER@$REMOTE_HOST "mkdir -p ${REMOTE_DIR}"
+          ssh -p $REMOTE_PORT $REMOTE_USER@$REMOTE_HOST "mkdir -p ${REMOTE_DIR}"
 
           # Run rsync
           rsync -avz -e "ssh -p $REMOTE_PORT" ./ $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR \
