@@ -1,0 +1,153 @@
+# Blue-Green Deployment Workflow
+
+on:
+  workflow_dispatch: # Allows manual triggering of the workflow
+
+jobs:
+  # Check which environment is currently active
+  get-active-environment:
+    runs-on: ubuntu-latest
+    outputs:
+      env_value: ${{ steps.set-env-output.outputs.env_value }}
+      project_dir: ${{ steps.set-env-output.outputs.project_dir }}
+
+    steps:
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.HOSTINGER_SSH_KEY }}
+
+      - name: Determine current environment
+        id: get-active
+        run: |
+          ssh -p 65002 -o StrictHostKeyChecking=no u605848448@217.21.77.232 \
+          'readlink /home/u605848448/domains/michael-gibbs-testing.site/public_html/current || echo "ERROR"' > current_env.txt
+          if [ ! -s current_env.txt ]; then
+            echo "ERROR: No environment file found or permission denied" > current_env.txt
+          fi
+
+      - name: Set environment based on active
+        id: set-env-output
+        run: |
+          env_value=$(cat current_env.txt | tr -d '\n' | tr -d '\r')  # Remove newlines or carriage returns
+
+          # Set project directory based on environment
+          if [[ "$env_value" == "/home/u605848448/domains/michael-gibbs-testing.site/blue/public/" ]]; then
+            project_dir="/home/u605848448/domains/michael-gibbs-testing.site/blue/"
+          else
+            project_dir="/home/u605848448/domains/michael-gibbs-testing.site/green/"
+          fi
+
+          # Persist to GITHUB_ENV
+          echo "::set-output name=env_value::$env_value"
+          echo "::set-output name=project_dir::$project_dir"
+          echo "env_value=$env_value" >> $GITHUB_ENV
+          echo "project_dir=$project_dir" >> $GITHUB_ENV
+
+      - name: Output environment value
+        run: |
+          echo "Environment: ${{ env.env_value }}"
+          echo "Project Directory: ${{ env.project_dir }}"
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: get-active-environment
+    steps:
+      - name: Output environment values
+        run: |
+          echo "Environment from output: ${{ needs.get-active-environment.outputs.env_value }}"
+          echo "Project Directory from output: ${{ needs.get-active-environment.outputs.project_dir }}"
+          echo "Environment: ${{ env.env_value }}"
+          echo "Project Directory: ${{ env.project_dir }}"
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # Install dependencies for Laravel app
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2' # or your specific version
+
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      # Step 5: Run tests
+      - name: Run Unit and Feature Tests
+        run: php artisan test --parallel --no-interaction
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "$HOSTINGER_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 217.21.77.232 >> ~/.ssh/known_hosts || true
+
+        env:
+          HOSTINGER_SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
+
+      - name: Test SSH Connection
+        run: |
+          ssh -o StrictHostKeyChecking=no -p 65002 u605848448@217.21.77.232 "echo 'SSH connection successful!'"
+
+      - name: Deploy to Standby Environment
+        if: ${{ needs.get-active-environment.outputs.env_value == '/home/u605848448/domains/michael-gibbs-testing.site/blue/public/' }}
+        run: |
+          # Define variables
+          REMOTE_USER="u605848448"    # Replace with your Hostinger username
+          REMOTE_HOST="217.21.77.232" # Replace with your Hostinger server IP or hostname
+          REMOTE_PORT="65002"         # Replace with your SSH port
+          # REMOTE_DIR="/home/u605848448/domains/michael-gibbs-testing.site/green/" # Replace with your destination directory
+          REMOTE_DIR="domains/michael-gibbs-testing.site/green/" # Replace with your destination directory
+
+          # Run rsync
+          rsync -avz -e "ssh -p $REMOTE_PORT" ./ $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR \
+            --exclude='.git' \
+            --exclude='node_modules/' \
+            --exclude='.env' \
+            --exclude='tests/' \
+            --delete
+
+      - name: Deploy to Blue Environment
+        if: ${{ needs.get-active-environment.outputs.env_value == '/home/u605848448/domains/michael-gibbs-testing.site/green/public/' }}
+        run: |
+          # Define variables
+          REMOTE_USER="u605848448"    # Replace with your Hostinger username
+          REMOTE_HOST="217.21.77.232" # Replace with your Hostinger server IP or hostname
+          REMOTE_PORT="65002"         # Replace with your SSH port
+          # REMOTE_DIR="/home/u605848448/domains/michael-gibbs-testing.site/green/" # Replace with your destination directory
+          REMOTE_DIR="domains/michael-gibbs-testing.site/blue/" # Replace with your destination directory
+
+          # Run rsync
+          rsync -avz -e "ssh -p $REMOTE_PORT" ./ $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR \
+            --exclude='.git' \
+            --exclude='node_modules/' \
+            --exclude='.env' \
+            --exclude='tests/' \
+            --delete
+
+  swap:
+      runs-on: ubuntu-latest
+      needs: deploy
+      if: success()
+      steps:
+        - name: Set up SSH
+          uses: webfactory/ssh-agent@v0.5.3
+          with:
+            ssh-private-key: ${{ secrets.HOSTINGER_SSH_KEY }}
+
+        - name: Swap Environments
+          run: |
+            ssh -p 65002 -o StrictHostKeyChecking=no u605848448@217.21.77.232 << 'EOF'
+            CURRENT_TARGET=$(readlink /home/u605848448/domains/michael-gibbs-testing.site/public_html/current)
+
+            if [[ "$CURRENT_TARGET" == "/home/u605848448/domains/michael-gibbs-testing.site/blue/public/" ]]; then
+              ln -sfn /home/u605848448/domains/michael-gibbs-testing.site/green/public/ /home/u605848448/domains/michael-gibbs-testing.site/public_html/current
+            elif [[ "$CURRENT_TARGET" == "/home/u605848448/domains/michael-gibbs-testing.site/green/public/" ]]; then
+              ln -sfn /home/u605848448/domains/michael-gibbs-testing.site/blue/public/ /home/u605848448/domains/michael-gibbs-testing.site/public_html/current
+            else
+              echo "ERROR: Unknown current target: $CURRENT_TARGET"
+              exit 1
+            fi
+            EOF
