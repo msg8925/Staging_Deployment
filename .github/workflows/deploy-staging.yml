@@ -26,8 +26,8 @@ jobs:
 
       # Step 5: Run tests
       - name: Run Unit and Feature Tests
-        # run: php artisan test --parallel --no-interaction
-        run: vendor/bin/phpunit --no-interaction --verbose
+        run: php artisan test --parallel --no-interaction
+        
 
       - name: Set up SSH key
         run: |
