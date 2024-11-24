@@ -6,13 +6,13 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 
-// uses(RefreshDatabase::class, WithFaker::class)->group('api');
+uses(RefreshDatabase::class, WithFaker::class)->group('api');
 
-// it('returns a successful response', function () {
-//     $response = $this->get('/');
+it('Test Users route is accessible', function () {
+    $response = $this->get('/api/user');
 
-//     $response->assertStatus(200);
-// });
+    $response->assertStatus(200);
+});
 
 
 // it('Test the user route', function () {
@@ -48,7 +48,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 //     // ]);
 // });
 
-
+// Test GET all User route
 test('fetch all users', function () {
 
     // Create 5 random user and store them in the DB
@@ -57,10 +57,9 @@ test('fetch all users', function () {
     // Peform a HTTP GET request on user route
     $response = $this->getJson('/api/user');
 
-    dd($response);
+    // dd($response);
 
     // Check HTTP status and ensure 5 users are returned
-    $response->assertStatus(200)
-             ->assertJsonCount(5, 'data');
+    $response->assertStatus(200)->assertJsonCount(5, 'data');
 });
 

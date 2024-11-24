@@ -1,9 +1,9 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use function Pest\Laravel\json;
 
-Route::get('/user', function (Request $request) {
-    return response()->json(["Name" => "Hellen", "Age" => "40"]);
-});
+// Get all users
+Route::get('/user', [UserController::class, 'index']);
