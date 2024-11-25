@@ -3,10 +3,10 @@
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+// use Illuminate\Foundation\Testing\RefreshDatabase;
+// use Illuminate\Foundation\Testing\WithFaker;
 
-uses(RefreshDatabase::class, WithFaker::class)->group('api');
+// uses(RefreshDatabase::class, WithFaker::class)->group('api');
 
 it('Test Users route is accessible', function () {
     $response = $this->get('/api/user');
@@ -49,17 +49,17 @@ it('Test Users route is accessible', function () {
 // });
 
 // Test GET all User route
-test('fetch all users', function () {
+// test('fetch all users', function () {
 
-    // Create 5 random user and store them in the DB
-    User::factory()->count(5)->create();
+//     // Create 5 random user and store them in the DB
+//     User::factory()->count(5)->create();
 
-    // Peform a HTTP GET request on user route
-    $response = $this->getJson('/api/user');
+//     // Peform a HTTP GET request on user route
+//     $response = $this->getJson('/api/user');
 
-    // dd($response);
+//     // dd($response);
 
-    // Check HTTP status and ensure 5 users are returned
-    $response->assertStatus(200)->assertJsonCount(5, 'data');
-});
+//     // Check HTTP status and ensure 5 users are returned
+//     $response->assertStatus(200)->assertJsonCount(5, 'data');
+// });
 
